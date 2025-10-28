@@ -1,9 +1,28 @@
-𝗧𝗿𝗮𝗰𝗸𝗶𝗻𝗴:
-    ⁡⁣⁣⁢(orders/signals.py) ⁡Listening to signal from order instance creation event. Then setting that order's tracking status to "pending"
+
+BackEnd:
     
+    𝗧𝗿𝗮𝗰𝗸𝗶𝗻𝗴:
+        ⁡⁣⁣⁢(orders/signals.py) ⁡Listening to signal from order instance creation event. Then setting that order's tracking status to "pending"
+    
+    Dependancies:
+        pip install django-cors-headers
+
+                
+
 ---------------------------------------------------------------------------------------------------------------
 FrontEnd: 
 
 Dependancies:
+    npm create vite@latest frontend -- --template react
+    cd frontend
+    npm install
     install nvm-windows
+    npm install -D tailwindcss@latest postcss@latest autoprefixer@latest
     nvm install node
+    npm install react-router-dom
+    npm install axios
+    
+---------------------------------------------------------------------------------------------------------------
+Pre-Production Checks:
+    CORS_ALLOW_ALL_ORIGINS = True  # for development only TODO: Tighten allowed origins allowed list
+
