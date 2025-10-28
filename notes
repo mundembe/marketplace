@@ -1,3 +1,9 @@
 𝗧𝗿𝗮𝗰𝗸𝗶𝗻𝗴:
     ⁡⁣⁣⁢(orders/signals.py) ⁡Listening to signal from order instance creation event. Then setting that order's tracking status to "pending"
     
+---------------------------------------------------------------------------------------------------------------
+FrontEnd: 
+
+Dependancies:
+    install nvm-windows
+    nvm install node
