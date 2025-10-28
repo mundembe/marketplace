@@ -21,7 +21,7 @@ Dependancies:
     nvm install node
     npm install react-router-dom
     npm install axios
-    
+    npm install jwt-decode
 ---------------------------------------------------------------------------------------------------------------
 Pre-Production Checks:
     CORS_ALLOW_ALL_ORIGINS = True  # for development only TODO: Tighten allowed origins allowed list
