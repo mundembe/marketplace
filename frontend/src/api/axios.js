@@ -7,4 +7,13 @@ const api = axios.create({
     },
 })
 
+// If you use AuthContext, attach the token automatically
+api.interceptors.request.use((config) => {
+  const access = localStorage.getItem("access");
+  if (access) {
+    config.headers.Authorization = `Bearer ${access}`;
+  }
+  return config;
+});
+
 export default api;

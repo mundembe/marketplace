@@ -6,6 +6,7 @@ BackEnd:
     
     Dependancies:
         pip install django-cors-headers
+        python -m pip install Pillow        # for images
 
                 
 
@@ -26,3 +27,11 @@ Dependancies:
 Pre-Production Checks:
     CORS_ALLOW_ALL_ORIGINS = True  # for development only TODO: Tighten allowed origins allowed list
 
+---------------------------------------------------------------------------------------------------------------
+How to run:
+    start django server
+        cd .\backend\
+        python manage.py runserver
+    start vite backend
+        cd .\frontend\
+        npm run dev

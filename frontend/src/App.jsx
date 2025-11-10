@@ -1,28 +1,22 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ProductsPage from "./pages/ProductsPage";
 import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
-import { AuthProvider } from "./context/AuthContext";
-import ProtectedRoute from "./router/ProtectedRoute"; // added
+import ProtectedRoute from "./router/ProtectedRoute";
 
-function App() {
+export default function App() {
   return (
     <Router>
-      <AuthProvider>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/login" element={<LoginPage />} />
-          
-        </Routes>
-      </AuthProvider>
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <ProductsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/login" element={<LoginPage />} />
+      </Routes>
     </Router>
   );
 }
-
-export default App;
