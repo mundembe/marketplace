@@ -21,6 +21,14 @@ class ShopOwnerOrderListView(generics.ListAPIView):
     def get_queryset(self):
         # Show only orders containing the shop owner's products
         return Order.objects.filter(items__product__shop_owner=self.request.user).distinct()
+    
+class ShopperOrderDetailView(generics.RetrieveAPIView):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated, IsShopper]
+
+    def get_queryset(self):
+        # Only fetch orders belonging to the logged-in user
+        return Order.objects.filter(user=self.request.user)
 
 class ActiveCartView(APIView):
     permission_classes = [IsAuthenticated]
@@ -64,3 +72,18 @@ class OrderItemDeleteView(generics.DestroyAPIView):
         order.save()
 
         return Response({"detail": "Item removed", "total": order.total_amount}, status=status.HTTP_204_NO_CONTENT)
+
+class OrderDetailView(generics.RetrieveAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Shopper can only see their own orders
+        if hasattr(user, 'role') and user.role == 'shopper':
+            return Order.objects.filter(user=user)
+        # Shop owners can see orders containing their products
+        elif hasattr(user, 'role') and user.role == 'shop_owner':
+            return Order.objects.filter(items__product__shop_owner=user).distinct()
+        return Order.objects.none()
