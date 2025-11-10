@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'orders',
     'analytics',
     'interactions',
+    'cart',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    'accounts.middleware.AutoRefreshJWTMiddleware',
 ]
 
 ROOT_URLCONF = "marketplace.urls"
@@ -153,11 +155,12 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': False,
-    'BLACKLIST_AFTER_ROTATION': False,
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # short-lived token
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),    # longer-lived token
+    'ROTATE_REFRESH_TOKENS': True,                  # issue a new refresh each time
+    'BLACKLIST_AFTER_ROTATION': True,               # block old tokens
     'AUTH_HEADER_TYPES': ('Bearer',),
+    'UPDATE_LAST_LOGIN': True,
 }
 
 CORS_ALLOW_ALL_ORIGINS = True  # for development TODO: update this before production to restrict allowed origins
