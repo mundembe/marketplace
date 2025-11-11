@@ -3,119 +3,129 @@ import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 export default function CheckoutPage() {
-  const navigate = useNavigate();
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [shippingAddress, setShippingAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("COD");
-  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   // Fetch cart
-  const fetchCart = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get("cart/");
-      setCart(res.data);
-    } catch (err) {
-      setError("Failed to load cart.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchCart = async () => {
+      try {
+        const res = await api.get("cart/");
+        setCart(res.data);
+      } catch {
+        alert("Failed to load cart");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchCart();
   }, []);
 
-  const handleSubmit = async (e) => {
+  const handleCheckout = async (e) => {
     e.preventDefault();
-    if (!cart || cart.items.length === 0) {
+    if (!cart?.items?.length) {
       alert("Your cart is empty!");
       return;
     }
 
-    setSubmitting(true);
     try {
       const payload = { shipping_address: shippingAddress, payment_method: paymentMethod };
-      const res = await api.post("cart/checkout/", payload, {
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await api.post("cart/checkout/", payload);
       alert("Order placed successfully!");
-      console.log(res.data);
-      navigate("/orders"); // redirect to orders page
+      navigate(`/orders/${res.data.id}`);
     } catch (err) {
       console.error("Checkout failed:", err.response?.data || err.message);
-      alert("Checkout failed: " + JSON.stringify(err.response?.data));
-    } finally {
-      setSubmitting(false);
+      alert("Checkout failed. Please try again.");
     }
   };
 
-  if (loading) return <p className="text-center mt-10">Loading cart...</p>;
-  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
-  if (!cart || cart.items.length === 0)
-    return <p className="text-center mt-10">Your cart is empty.</p>;
+  if (loading) return <p className="text-center mt-10">Loading checkout...</p>;
+  if (!cart || !cart.items.length)
+    return <p className="text-center mt-10 text-gray-500">Your cart is empty.</p>;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Checkout</h1>
 
-      {/* Cart Summary */}
-      <div className="mb-6 border rounded-lg p-4">
-        <h2 className="text-xl font-semibold mb-2">Order Summary</h2>
-        <div className="space-y-2">
-          {cart.items.map((item) => (
-            <div key={item.id} className="flex justify-between">
-              <p>
-                {item.product.title} x {item.quantity}
-              </p>
-              <p>${Number(item.subtotal).toFixed(2)}</p>
-            </div>
-          ))}
-        </div>
-        <hr className="my-2" />
-        <p className="text-right font-bold">
-          Total: ${cart.total_amount ? Number(cart.total_amount).toFixed(2) : "0.00"}
-        </p>
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Cart Summary */}
+        <div className="md:col-span-2 rounded-lg shadow p-4">
+          <h2 className="text-lg font-semibold mb-4">Your Items</h2>
+          <div className="space-y-4">
+            {cart.items.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between border-b pb-3"
+              >
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={
+                      item.product_image ||
+                      item.product?.primary_image ||
+                      "https://via.placeholder.com/80"
+                    }
+                    alt={item.product?.title}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                  <div>
+                    <p className="font-medium">{item.product?.title}</p>
+                    <p className="text-gray-600 text-sm">
+                      ${item.product?.price} × {item.quantity}
+                    </p>
+                  </div>
+                </div>
+                <p className="font-semibold">${item.subtotal}</p>
+              </div>
+            ))}
+          </div>
 
-      {/* Checkout Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block font-medium mb-1">Shipping Address</label>
-          <input
-            type="text"
-            value={shippingAddress}
-            onChange={(e) => setShippingAddress(e.target.value)}
-            required
-            className="w-full border rounded px-3 py-2"
-            placeholder="Enter shipping address"
-          />
-        </div>
-
-        <div>
-          <label className="block font-medium mb-1">Payment Method</label>
-          <select
-            value={paymentMethod}
-            onChange={(e) => setPaymentMethod(e.target.value)}
-            className="w-full border rounded px-3 py-2"
-          >
-            <option value="COD">Cash on Delivery</option>
-            <option value="Credit Card">Credit Card</option>
-          </select>
+          <div className="flex justify-between mt-6 text-lg font-bold">
+            <p>Total:</p>
+            <p>${cart.total_amount}</p>
+          </div>
         </div>
 
-        <div className="mt-6 flex justify-end">
+        {/* Checkout Form */}
+        <form
+          onSubmit={handleCheckout}
+          className="bg-white rounded-lg shadow p-4 space-y-4"
+        >
+          <h2 className="text-lg font-semibold mb-2">Shipping Details</h2>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Shipping Address</label>
+            <textarea
+              value={shippingAddress}
+              onChange={(e) => setShippingAddress(e.target.value)}
+              className="w-full border rounded p-2"
+              placeholder="Enter your address"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Payment Method</label>
+            <select
+              value={paymentMethod}
+              onChange={(e) => setPaymentMethod(e.target.value)}
+              className="w-full border rounded p-2"
+            >
+              <option value="COD">Cash on Delivery</option>
+              <option value="Credit Card">Credit Card</option>
+            </select>
+          </div>
+
           <button
             type="submit"
-            disabled={submitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="w-full py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            {submitting ? "Placing Order..." : "Place Order"}
+            Place Order
           </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }

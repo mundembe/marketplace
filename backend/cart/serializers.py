@@ -11,12 +11,14 @@ class CartItemSerializer(serializers.ModelSerializer):
         source="product",
         write_only=True
     )
+    product_image = serializers.ImageField(source='product.primary_image', read_only=True)
+
     unit_price = serializers.ReadOnlyField(source="product.price")
     subtotal = serializers.SerializerMethodField()
 
     class Meta:
         model = CartItem
-        fields = ["id", "product", "product_id", "quantity", "unit_price", "subtotal"]
+        fields = ["id", "product", "product_id", "quantity", "unit_price", "product_image", "subtotal"]
 
     def get_subtotal(self, obj):
         return obj.quantity * obj.product.price

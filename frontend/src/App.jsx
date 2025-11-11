@@ -8,7 +8,7 @@ import OrdersPage from "./pages/OrdersPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 
 import ProtectedRoute from "./router/ProtectedRoute";
-
+import LayoutWithNavbar from "./layout/LayoutWithNavbar";
 
 export default function App() {
   return (
@@ -18,7 +18,9 @@ export default function App() {
           path="/"
           element={
             <ProtectedRoute>
-              <ProductsPage />
+              <LayoutWithNavbar>
+                <ProductsPage />
+              </LayoutWithNavbar>
             </ProtectedRoute>
           }
         />
@@ -26,7 +28,9 @@ export default function App() {
           path="/products/:id"
           element={
             <ProtectedRoute>
-              <ProductDetailPage />
+              <LayoutWithNavbar>
+                <ProductDetailPage />
+              </LayoutWithNavbar>
             </ProtectedRoute>
           }
         />
@@ -34,7 +38,9 @@ export default function App() {
           path="/cart"
           element={
             <ProtectedRoute>
-              <CartPage />
+              <LayoutWithNavbar>
+                <CartPage />
+              </LayoutWithNavbar>
             </ProtectedRoute>
           }
         />
@@ -42,7 +48,9 @@ export default function App() {
           path="/checkout"
           element={
             <ProtectedRoute>
-              <CheckoutPage />
+              <LayoutWithNavbar>
+                <CheckoutPage />
+              </LayoutWithNavbar>
             </ProtectedRoute>
           }
         />
@@ -50,7 +58,9 @@ export default function App() {
           path="/orders"
           element={
             <ProtectedRoute>
-              <OrdersPage />
+              <LayoutWithNavbar>
+                <OrdersPage />
+              </LayoutWithNavbar>
             </ProtectedRoute>
           }
         />
@@ -58,7 +68,9 @@ export default function App() {
           path="/orders/:id"
           element={
             <ProtectedRoute>
-              <OrderDetailPage />
+              <LayoutWithNavbar>
+                <OrderDetailPage />
+              </LayoutWithNavbar>
             </ProtectedRoute>
           }
         />

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api/axios";
 
@@ -9,60 +9,85 @@ export default function OrdersPage() {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      setLoading(true);
-      setError("");
       try {
         const res = await api.get("orders/shopper/");
-        console.log("Orders fetched:", res.data.results);
-        setOrders(res.data.results || []);
+        setOrders(res.data.results);
       } catch (err) {
-        console.error("Failed to fetch orders:", err.response?.data || err.message);
         setError("Failed to load orders.");
       } finally {
         setLoading(false);
       }
     };
-
     fetchOrders();
   }, []);
 
   if (loading) return <p className="text-center mt-10">Loading orders...</p>;
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
 
-  return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-4">My Orders</h1>
+  if (orders.length === 0)
+    return (
+      <p className="text-center mt-10">
+        No orders yet.{" "}
+        <Link to="/" className="text-blue-600 hover:underline">
+          Shop now
+        </Link>
+      </p>
+    );
 
-      {orders.length === 0 ? (
-        <p>
-          No orders yet. <Link to="/" className="text-blue-600 hover:underline">Shop now</Link>
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {orders.map(order => (
-            order && order.id ? (
+  return (
+    <div className="max-w-5xl mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Your Orders</h1>
+
+      <div className="space-y-6">
+        {orders.map((order) => (
+          <div
+            key={order.id}
+            className="border rounded-lg p-4 shadow-sm hover:shadow-md transition"
+          >
+            <div className="flex justify-between mb-3">
+              <p>
+                <span className="font-semibold">Order ID:</span> #{order.id}
+              </p>
+              <p className="font-semibold text-blue-600">
+                {order.status.toUpperCase()}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-4">
+              {order.items.map((item) => (
+                <div key={item.id} className="flex items-center space-x-3">
+                  <img
+                    src={
+                      item.product_image ||
+                      "https://via.placeholder.com/80?text=No+Image"
+                    }
+                    alt={item.product_title}
+                    className="w-16 h-16 object-cover rounded-md"
+                  />
+                  <div>
+                    <p className="font-medium">{item.product_title}</p>
+                    <p className="text-gray-500 text-sm">
+                      {item.quantity} × ${item.unit_price}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex justify-between items-center mt-4">
+              <p className="font-semibold">
+                Total: ${Number(order.total_amount).toFixed(2)}
+              </p>
               <Link
-                key={order.id}
-                to={`/orders/${order.id}`} // make sure OrderDetailPage route exists
-                className="block border p-4 rounded-lg hover:bg-gray-100"
+                to={`/orders/${order.id}`}
+                className="text-blue-600 hover:underline"
               >
-                <p>
-                  <span className="font-semibold">Order ID:</span> {order.id}
-                </p>
-                <p>
-                  <span className="font-semibold">Status:</span> {order.status}
-                </p>
-                <p>
-                  <span className="font-semibold">Total:</span> ${Number(order.total_amount || 0).toFixed(2)}
-                </p>
-                <p>
-                  <span className="font-semibold">Items:</span> {order.items?.length || 0}
-                </p>
+                View Details →
               </Link>
-            ) : null
-          ))}
-        </div>
-      )}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom";
 import api from "../api/axios";
 
 export default function CartPage() {
@@ -71,7 +71,12 @@ export default function CartPage() {
                 className="flex items-center justify-between border p-4 rounded-lg"
               >
                 <div>
-                  <p className="font-semibold">{item.product_title}</p>
+                  <img
+                    src={item.product.primary_image || (item.product.images?.[0]?.image) || "https://via.placeholder.com/100"}
+                    alt={item.product.title}
+                    className="w-16 h-16 object-cover rounded mr-4"
+                  />
+
                   <p>
                     ${item.unit_price} x {item.quantity} = ${item.subtotal}
                   </p>

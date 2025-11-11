@@ -5,7 +5,7 @@ from shop.models import Product
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product_title = serializers.ReadOnlyField(source='product.title')
-    product_image = serializers.ImageField(source='product.image', read_only=True)
+    product_image = serializers.ImageField(source='product.primary_image', read_only=True)
     unit_price = serializers.ReadOnlyField()
     subtotal = serializers.ReadOnlyField()
 
