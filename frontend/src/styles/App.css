@@ -1,9 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 #root {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
 }
+
+body {
+  @apply bg-gray-50 text-gray-800;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Global link styles */
+a {
+  @apply text-blue-600 hover:text-blue-700 transition-colors;
+}
+
 
 .logo {
   height: 6em;
