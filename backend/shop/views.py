@@ -1,4 +1,4 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, filters
 from rest_framework.permissions import SAFE_METHODS, BasePermission
 from .models import Category, Product
 from .serializers import CategorySerializer, ProductSerializer
@@ -14,6 +14,8 @@ class CategoryListCreateView(generics.ListCreateAPIView):
 class ProductListView(generics.ListAPIView):
     queryset = Product.objects.filter(is_active=True)
     serializer_class = ProductSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'description', 'category__name']
 
 
 class ProductCreateView(generics.CreateAPIView):

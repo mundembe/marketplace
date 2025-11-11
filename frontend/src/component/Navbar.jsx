@@ -1,46 +1,109 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { ShoppingCart, Search } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import api from "../api/axios";
 
 export default function Navbar() {
-  const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchInputRef = useRef(null);
+
+  const params = new URLSearchParams(location.search);
+  const initialQuery = params.get("q") || "";
+
+  const [query, setQuery] = useState(initialQuery);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   const handleSearch = (e) => {
     e.preventDefault();
     if (query.trim()) {
-      navigate(`/?search=${encodeURIComponent(query.trim())}`);
+      navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+      setShowDropdown(false);
     }
   };
 
+  const handleChange = async (e) => {
+    const value = e.target.value;
+    setQuery(value);
+
+    if (value.trim().length === 0) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    try {
+      const res = await api.get(`shop/products/?search=${value.trim()}`);
+      setSuggestions(res.data.results.slice(0, 5)); // limit 5 suggestions
+      setShowDropdown(true);
+    } catch (err) {
+      console.error("Autocomplete error:", err);
+      setSuggestions([]);
+    }
+  };
+
+  const handleSelect = (productId) => {
+    navigate(`/products/${productId}`);
+    setQuery("");
+    setSuggestions([]);
+    setShowDropdown(false);
+  };
+
+  const handleBlur = () => {
+    // small delay so click event on suggestion registers first
+    setTimeout(() => setShowDropdown(false), 100);
+  };
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md px-6 py-3 flex justify-between items-center">
+    <nav className="bg-white shadow-sm p-4 flex justify-between items-center relative">
       <Link to="/" className="text-xl font-bold text-blue-600">
-        MarketPlace
+        Marketplace
       </Link>
 
-      <form onSubmit={handleSearch} className="flex items-center space-x-2">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search products..."
-          className="border rounded-lg px-3 py-1 w-64 focus:outline-none focus:ring focus:border-blue-400"
-        />
-        <button type="submit" className="text-gray-600 hover:text-blue-600">
-          <Search size={20} />
-        </button>
-      </form>
+      <div className="w-1/2 relative">
+        <form onSubmit={handleSearch} className="flex w-full">
+          <input
+            type="text"
+            ref={searchInputRef}
+            placeholder="Search for products..."
+            value={query}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            onFocus={() => query && setShowDropdown(true)}
+            className="flex-grow border border-gray-300 rounded-l-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700"
+          >
+            Search
+          </button>
+        </form>
 
-      <div className="flex items-center space-x-6">
-        <Link to="/cart" className="relative flex items-center text-gray-700 hover:text-blue-600">
-          <ShoppingCart size={22} />
-          <span className="ml-1">Cart</span>
-        </Link>
-        <Link to="/orders" className="text-gray-700 hover:text-blue-600">
-          Orders
-        </Link>
+        {/* Autocomplete Dropdown */}
+        {showDropdown && suggestions.length > 0 && (
+          <ul className="absolute bg-white border border-gray-300 mt-1 w-full rounded-md shadow-lg z-50 max-h-60 overflow-y-auto">
+            {suggestions.map((product) => (
+              <li
+                key={product.id}
+                className="px-3 py-2 text-gray-800 hover:bg-blue-100 cursor-pointer"
+                onMouseDown={() => handleSelect(product.id)} // use onMouseDown instead of onClick
+              >
+                {product.title}
+              </li>
+            ))}
+          </ul>
+        )}
+
       </div>
+
+      <Link to="/cart" className="text-blue-600 font-medium hover:underline">
+        🛒 Cart
+      </Link>
     </nav>
   );
 }

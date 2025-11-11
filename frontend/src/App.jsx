@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProductsPage from "./pages/ProductsPage";
+import SearchResultsPage from "./pages/SearchResultsPage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import LoginPage from "./pages/LoginPage";
 import CartPage from "./pages/CartPage";
@@ -40,6 +41,16 @@ export default function App() {
             <ProtectedRoute>
               <LayoutWithNavbar>
                 <CartPage />
+              </LayoutWithNavbar>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/search"
+          element={
+            <ProtectedRoute>
+              <LayoutWithNavbar>
+                <SearchResultsPage />
               </LayoutWithNavbar>
             </ProtectedRoute>
           }
